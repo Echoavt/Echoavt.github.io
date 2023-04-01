@@ -72,6 +72,83 @@
       background-image: linear-gradient(135deg, darkgreen, green);
       border-color: darkgreen;
     }
+    
+    .header {
+      font-size: 48px;
+      color: white;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      margin-bottom: 30px;
+      animation: fadeInDown 1s ease;
+    }
+
+    @keyframes fadeInDown {
+      0% {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      font-size: 24px;
+      text-align: center;
+      padding: 20px 40px;
+      color: white;
+      background-color: red;
+      border: 3px solid white;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: 0.3s;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+      animation: fadeInUp 1s ease 0.5s;
+      animation-fill-mode: backwards;
+    }
+
+    @keyframes fadeInUp {
+      0% {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .button:hover {
+      background-color: darkred;
+      border-color: darkred;
+      box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    .button i {
+      margin-right: 10px;
+    }
+
+    .footer {
+      position: fixed;
+      bottom: 20px;
+      text-align: center;
+      font-size: 14px;
+      color: white;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        font-size: 36px;
+      }
+      .button {
+        font-size: 18px;
+        padding: 15px 30px;
+      }
+    }
+    
   </style>
 </head>
 <body>
@@ -82,70 +159,104 @@
   </div>
 
   <script>
-    function launchConfetti() {
-      particlesJS('particles-js', {
-        particles: {
-          number: {
-            value: 100
-          },
-          color: {
-            value: ['#ff0000', '#00ff00', '#0000ff']
-          },
-          shape: {
-            type: 'circle'
-          },
-          opacity: {
-            value: 1
-          },
-          size: {
-            value: 5
-          },
-          line_linked: {
-            enable: false
-          },
-          move: {
-            enable: true,
-            speed: 3,
-            direction: 'bottom',
-            random: true,
-            straight: false,
-            out_mode: 'out',
-            bounce: false,
-            attract: {
-              enable: false
-            }
-          }
+    let confettiActive = false;
+    const confettiConfig = {
+      "particles": {
+        "number": {
+          "value": 200
         },
-        interactivity: {
-          events: {
-            onhover: {
-              enable: false
-            },
-            onclick: {
-              enable: false
-            },
-            resize: true
-          }
+        "color": {
+          "value": ["#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF", "#00FFFF"]
         },
-        retina_detect: true
-      });
-      setTimeout(() => {
-        particlesJS.load('particles-js', {});
-      }, 5000);
-    }
+        "shape": {
+          "type": "circle"
+        },
+        "size": {
+          "value": 5
+        },
+        "opacity": {
+          "value": 1
+        },
+        "move": {
+          "enable": true,
+          "speed": 3
+        }
+      }
+    };
+
     document.getElementById('arduino-yippie').addEventListener('click', () => {
-  particlesJS.load('particles-js', confettiConfig);
-  setTimeout(() => {
-    stopConfetti();
-  }, 5000);
-});
+      if (!confettiActive) {
+        confettiActive = true;
+        particlesJS('particles-js', confettiConfig);
+        setTimeout(() => {
+          confettiActive = false;
+          stopConfetti();
+        }, 5000);
+      }
+    });
 
-function stopConfetti() {
-  const confettiCanvas = document.getElementById('particles-js');
-  confettiCanvas.style.display = 'none';
-}
-  </script>
+    function stopConfetti() {
+      if (window.pJSDom && window.pJSDom[0] && window.pJSDom[0].pJS) {
+        const confettiCanvas = document.getElementById('particles-js');
+        confettiCanvas.style.display = 'none';
+        window.pJSDom[0].pJS.fn.vendors.destroypJS();
+        window.pJSDom = [];
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="particles-js" style="position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1;"></div>
 
+  <button id="arduino-yippie">Arduino Yippie</button>
+
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <script>
+    let confettiActive = false;
+    const confettiConfig = {
+      "particles": {
+        "number": {
+          "value": 200
+        },
+        "color": {
+          "value": ["#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF", "#00FFFF"]
+        },
+        "shape": {
+          "type": "circle"
+        },
+        "size": {
+          "value": 5
+        },
+        "opacity": {
+          "value": 1
+        },
+        "move": {
+          "enable": true,
+          "speed": 3
+        }
+      }
+    };
+
+    document.getElementById('arduino-yippie').addEventListener('click', () => {
+      if (!confettiActive) {
+        confettiActive = true;
+        particlesJS('particles-js', confettiConfig);
+        setTimeout(() => {
+          confettiActive = false;
+          stopConfetti();
+        }, 5000);
+      }
+    });
+
+    function stopConfetti() {
+      if (window.pJSDom && window.pJSDom[0] && window.pJSDom[0].pJS) {
+        const confettiCanvas = document.getElementById('particles-js');
+        confettiCanvas.style.display = 'none';
+        window.pJSDom[0].pJS.fn.vendors.destroypJS();
+        window.pJSDom = [];
+      }
+    }
+ </script>
   <div id="particles-js" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;"></div>
 </body>
 </html>
