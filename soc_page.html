@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SOČ Tlačítko</title>
   <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" rel="stylesheet">
   <style>
     body {
       margin: 0;
@@ -28,7 +29,8 @@
     }
 
     .button {
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
       font-size: 24px;
       text-align: center;
       padding: 20px 40px;
@@ -47,6 +49,10 @@
       box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.4);
     }
 
+    .button i {
+      margin-right: 10px;
+    }
+
     .footer {
       position: fixed;
       bottom: 20px;
@@ -59,7 +65,10 @@
 </head>
 <body>
   <h1 class="header">Vítejte na SOČ stránce</h1>
-  <a href="http://wiki.sps-pi.cz/index.php/SOC" class="button">SOČ</a>
-  <div class="footer">&copy; 2023 Milan Janoušek (šikovný). Všechna práva vyhrazena.</div>
+  <a href="http://wiki.sps-pi.cz/index.php/SOC" class="button"><i class="fas fa-rocket"></i>SOČ</a>
+  <div class="footer">
+    <p>&copy; 2023 Milan Janoušek (šikovný). Všechna práva vyhrazena.</p>
+    <p>Navštivte nás na <a href="https://www.facebook.com/" style="color: white; text-decoration: underline;"><i class="fab fa-facebook"></i>Facebooku</a> a <a href="https://www.instagram.com/" style="color: white; text-decoration: underline;"><i class="fab fa-instagram"></i>Instagramu</a>!</p>
+  </div>
 </body>
 </html>
