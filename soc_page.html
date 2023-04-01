@@ -143,8 +143,8 @@ body {
 
 .confetti {
   position: absolute;
-  width: 10px;
-  height: 10px;
+  width: 15px;
+  height: 15px;
   background-color: rgba(255, 255, 255, 0.8);
   border-radius: 50%;
   opacity: 0;
@@ -234,6 +234,26 @@ body {
         window.pJSDom = [];
       }
     }
+    document.querySelector('.button-green').addEventListener('click', () => {
+  launchConfetti();
+});
+
+function launchConfetti() {
+  // Zde můžete přidat počet konfet, které chcete vytvořit
+  const confettiCount = 100;
+
+  // Vyčistit konfety z kontejneru před spuštěním nových
+  const container = document.querySelector('.confetti-container');
+  container.innerHTML = '';
+
+  for (let i = 0; i < confettiCount; i++) {
+    const confetti = document.createElement('div');
+    confetti.className = 'confetti';
+    confetti.style.left = Math.random() * 100 + '%';
+    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+    container.appendChild(confetti);
+  }
+}
   </script>
 </body>
 </html>
