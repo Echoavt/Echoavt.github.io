@@ -25,6 +25,11 @@
     let velocityY = 0;
     let onGround = false;
 
+    const transistorX = 300;
+    const transistorY = canvas.height - 80;
+    const transistorWidth = 20;
+    const transistorHeight = 30;
+
     function gameLoop() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -52,6 +57,16 @@
       ctx.fillStyle = 'green';
       ctx.fillRect(0, canvas.height - 50, canvas.width, 50);
 
+      // Render transistor
+      ctx.fillStyle = 'red';
+      ctx.fillRect(transistorX, transistorY, transistorWidth, transistorHeight);
+
+      // Check for player interaction with transistor
+      if (playerX + playerWidth > transistorX && playerX < transistorX + transistorWidth &&
+          playerY + playerHeight > transistorY && playerY < transistorY + transistorHeight) {
+        showTransistorPopup();
+      }
+
       requestAnimationFrame(gameLoop);
     }
 
@@ -66,6 +81,10 @@
         velocityY = -12;
         onGround = false;
       }
+    }
+
+    function showTransistorPopup() {
+      alert("Zde bude okno pro zapojení tranzistoru.");
     }
 
     document.addEventListener('keydown', movePlayer);
