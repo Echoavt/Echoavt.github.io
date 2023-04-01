@@ -4,17 +4,27 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SOČ Tlačítko</title>
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
       height: 100vh;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       background-image: url('https://echoavt.github.io/soc_page/SOC_obr1.JPG');
       background-size: cover;
       background-repeat: no-repeat;
       background-position: center;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    .header {
+      font-size: 48px;
+      color: white;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      margin-bottom: 30px;
     }
 
     .button {
@@ -28,15 +38,28 @@
       border-radius: 10px;
       text-decoration: none;
       transition: 0.3s;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
     }
 
     .button:hover {
       background-color: darkred;
       border-color: darkred;
+      box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    .footer {
+      position: fixed;
+      bottom: 20px;
+      text-align: center;
+      font-size: 14px;
+      color: white;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
     }
   </style>
 </head>
 <body>
+  <h1 class="header">Vítejte na SOČ stránce</h1>
   <a href="http://wiki.sps-pi.cz/index.php/SOC" class="button">SOČ</a>
+  <div class="footer">&copy; 2023 Vaše Jméno. Všechna práva vyhrazena.</div>
 </body>
 </html>
