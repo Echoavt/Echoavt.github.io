@@ -58,6 +58,14 @@
       }
     }
 
+    .buttons {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+      margin-bottom: 30px;
+      z-index: 2;
+    }
+
     .button {
       display: inline-flex;
       align-items: center;
@@ -65,7 +73,6 @@
       text-align: center;
       padding: 20px 40px;
       color: white;
-      background-image: linear-gradient(135deg, red, darkred);
       border: 3px solid white;
       border-radius: 10px;
       text-decoration: none;
@@ -73,23 +80,35 @@
       box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
       animation: fadeInUp 1s ease 0.5s;
       animation-fill-mode: backwards;
-      z-index: 2;
     }
 
-    @keyframes fadeInUp {
-      0% {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    .button-red {
+      background-image: linear-gradient(135deg, red, darkred);
     }
 
-    .button:hover {
+    .button-red:hover {
       background-image: linear-gradient(135deg, darkred, red);
       border-color: darkred;
+      box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    .button-blue {
+      background-image: linear-gradient(135deg, blue, darkblue);
+    }
+
+    .button-blue:hover {
+      background-image: linear-gradient(135deg, darkblue, blue);
+      border-color: darkblue;
+      box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    .button-green {
+      background-image: linear-gradient(135deg, limegreen, darkgreen);
+    }
+
+    .button-green:hover {
+      background-image: linear-gradient(135deg, darkgreen, limegreen);
+      border-color: darkgreen;
       box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.4);
     }
 
@@ -118,14 +137,82 @@
     }
 
   </style>
+  <script>
+    function createConfetti() {
+      const confettiCount = 200;
+      const confettiColors = ["red", "blue", "green", "yellow", "orange", "pink", "purple"];
+
+      for (let i = 0; i < confettiCount; i++) {
+        const confetti = document.createElement("div");
+        confetti.classList.add("confetti");
+        confetti.style.backgroundColor = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+        confetti.style.left = Math.floor(Math.random() * 100) + "vw";
+        confetti.style.animationDuration = Math.random() * 2 + 2 + "s";
+        confetti.style.animationDelay = Math.random() * 2 + "s";
+        document.body.appendChild(confetti);
+      }
+    }
+  </script>
 </head>
 <body>
   <div class="overlay"></div>
+  <div class="buttons">
+    <a href="http://wiki.sps-pi.cz/index.php/SOC" class="button button-red">
+      <i class="fas fa-rocket"></i>
+      SOČ
+    </a>
+    <a href="janousek_escape.html" class="button button-blue">
+      <i class="fas fa-gamepad"></i>
+      Janousek Escape
+    </a>
+    <a href="#" onclick="createConfetti()" class="button button-green">
+      <i class="fas fa-microchip"></i>
+      Arduino Yippie
+    </a>
+  </div>
   <h1 class="header">Vítejte na SOČ stránce</h1>
-  <a href="http://wiki.sps-pi.cz/index.php/SOC" class="button">
-    <i class="fas fa-rocket"></i>
-    SOČ
-  </a>
-  <div class="footer">&copy; 2023 Milan Janoušek (šikovný). Všechna práva vyhrazena.</div>
-</body>
-</html>  
+  <div class="footer">&copy; 2023 Milan Janoušek (šikovný). Všechna práva vyhrazena.
+    </div>
+    <style>
+      .confetti {
+        position: fixed;
+        width: 10px;
+        height: 10px;
+        top: -10px;
+        opacity: 0;
+        animation: confettiFall 4s linear infinite;
+      }
+
+      @keyframes confettiFall {
+        0% {
+          opacity: 1;
+          transform: translateY(-100%) rotate(0deg);
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(100%) rotate(720deg);
+        }
+      }
+
+    </style>
+  </head>
+  <body>
+    <div class="overlay"></div>
+    <div class="buttons">
+      <a href="http://wiki.sps-pi.cz/index.php/SOC" class="button button-red">
+        <i class="fas fa-rocket"></i>
+        SOČ
+      </a>
+      <a href="janousek_escape.html" class="button button-blue">
+        <i class="fas fa-gamepad"></i>
+        Janousek Escape
+      </a>
+      <a href="#" onclick="createConfetti()" class="button button-green">
+        <i class="fas fa-microchip"></i>
+        Arduino Yippie
+      </a>
+    </div>
+    <h1 class="header">Vítejte na SOČ stránce</h1>
+    <div class="footer">&copy; 2023 Milan Janoušek (šikovný). Všechna práva vyhrazena.</div>
+  </body>
+</html>
