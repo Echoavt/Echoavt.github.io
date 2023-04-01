@@ -6,6 +6,7 @@
   <title>Janoušek Escape</title>
   <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
   <style>
     * {
       box-sizing: border-box;
@@ -18,8 +19,14 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      background-color: #f0f0f0;
+      background-image: url('https://github.com/Echoavt/Echoavt.github.io/blob/main/SOC_obr1.jpg?raw=true');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      background-position: center;
       font-family: 'Roboto', sans-serif;
+      overflow: hidden;
+      position: relative;
     }
 
     .button-container {
@@ -71,7 +78,63 @@
   <div class="button-container">
     <a href="http://wiki.sps-pi.cz/index.php/SOC" class="button">SOČ</a>
     <a href="janousek_escape.html" class="button button-blue">Janoušek Escape</a>
-    <a href="#" class="button button-green">Arduino Yippie</a>
+    <a href="#" class="button button-green" onclick="launchConfetti()">Arduino Yippie</a>
   </div>
+
+  <script>
+    function launchConfetti() {
+      particlesJS('particles-js', {
+        particles: {
+          number: {
+            value: 100
+          },
+          color: {
+            value: ['#ff0000', '#00ff00', '#0000ff']
+          },
+          shape: {
+            type: 'circle'
+          },
+          opacity: {
+            value: 1
+          },
+          size: {
+            value: 5
+          },
+          line_linked: {
+            enable: false
+          },
+          move: {
+            enable: true,
+            speed: 3,
+            direction: 'bottom',
+            random: true,
+            straight: false,
+            out_mode: 'out',
+            bounce: false,
+            attract: {
+              enable: false
+            }
+          }
+        },
+        interactivity: {
+          events: {
+            onhover: {
+              enable: false
+            },
+            onclick: {
+              enable: false
+            },
+            resize: true
+          }
+        },
+        retina_detect: true
+      });
+      setTimeout(() => {
+        particlesJS.load('particles-js', {});
+      }, 5000);
+    }
+  </script>
+
+  <div id="particles-js" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;"></div>
 </body>
 </html>
