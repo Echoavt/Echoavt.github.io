@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Janousek Escape</title>
+  <style>
+    canvas {
+      border: 1px solid black;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas" width="640" height="480"></canvas>
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let playerX = 50;
+    let playerY = 50;
+    const playerWidth = 30;
+    const playerHeight = 30;
+
+    const gravity = 0.5;
+    let velocityY = 0;
+    let onGround = false;
+
+    function gameLoop() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Render player
+      ctx.fillStyle = 'blue';
+      ctx.fillRect(playerX, playerY, playerWidth, playerHeight);
+
+      // Apply gravity
+      if (!onGround) {
+        velocityY += gravity;
+      }
+
+      // Update player position
+      playerY += velocityY;
+
+      // Check for ground
+      if (playerY + playerHeight > canvas.height - 50) {
+        playerY = canvas.height - 50 - playerHeight;
+        onGround = true;
+      } else {
+        onGround = false;
+      }
+
+      // Render ground
+      ctx.fillStyle = 'green';
+      ctx.fillRect(0, canvas.height - 50, canvas.width, 50);
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    function movePlayer(event) {
+      const keyCode = event.keyCode;
+
+      if (keyCode === 37) { // Left arrow
+        playerX -= 10;
+      } else if (keyCode === 39) { // Right arrow
+        playerX += 10;
+      } else if (keyCode === 38 && onGround) { // Up arrow
+        velocityY = -12;
+        onGround = false;
+      }
+    }
+
+    document.addEventListener('keydown', movePlayer);
+    gameLoop();
+  </script>
+</body>
+</html>
