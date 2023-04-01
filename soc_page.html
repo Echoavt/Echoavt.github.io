@@ -130,32 +130,36 @@ body {
   margin-right: 8px;
 }
 
-/* Vlastní CSS kód pro konfety */
 .confetti-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 100;
-}
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 100;
+    }
 
-.confetti {
-  position: absolute;
-  width: 15px;
-  height: 15px;
-  background-color: rgba(255, 255, 255, 0.8);
-  border-radius: 50%;
-  opacity: 0;
-  animation: confetti-fall 4s linear infinite;
-}
+    .confetti {
+      position: absolute;
+      width: 15px;
+      height: 15px;
+      background-color: rgba(255, 255, 255, 0.8);
+      border-radius: 50%;
+      opacity: 0;
+      animation: confetti-fall 4s linear infinite;
+    }
 
-@keyframes confetti-fall {
-  0% {
-    opacity: 1;
-    transform: translateY(-100%);
-  }
+    @keyframes confetti-fall {
+      0% {
+        opacity: 1;
+        transform: translateY(-100%);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(100%);
+      }
+    }
   100% {
     opacity: 1;
     transform: translateY(100%);
@@ -181,79 +185,33 @@ body {
   </style>
 </head>
 <body>
+  <div class="confetti-container"></div>
   <div class="button-container">
     <a href="http://wiki.sps-pi.cz/index.php/SOC" class="button">SOČ</a>
     <a href="janousek_escape.html" class="button button-blue">Janoušek Escape</a>
-    <button class="button button-green" onclick="launchConfetti()">Arduino Yippie</button>
+    <button class="button button-green">Arduino Yippie</button>
   </div>
 
   <div id="particles-js" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;"></div>
 
   <script>
-    let confettiActive = false;
-    const confettiConfig = {
-      "particles": {
-        "number": {
-          "value": 200
-        },
-        "color": {
-          "value": ["#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF", "#00FFFF"]
-        },
-        "shape": {
-          "type": "circle"
-        },
-        "size": {
-          "value": 5
-        },
-        "opacity": {
-          "value": 1
-        },
-        "move": {
-          "enable": true,
-          "speed": 3
-        }
-      }
-    };
+    document.querySelector('.button-green').addEventListener('click', () => {
+      launchConfetti();
+    });
 
     function launchConfetti() {
-      if (!confettiActive) {
-        confettiActive = true;
-        particlesJS('particles-js', confettiConfig);
-        setTimeout(() => {
-          confettiActive = false;
-          stopConfetti();
-        }, 5000);
+      const confettiCount = 100;
+      const container = document.querySelector('.confetti-container');
+      container.innerHTML = '';
+
+      for (let i = 0; i < confettiCount; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.left = Math.random() * 100 + '%';
+        confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+        container.appendChild(confetti);
       }
     }
-
-    function stopConfetti() {
-      if (window.pJSDom && window.pJSDom[0] && window.pJSDom[0].pJS) {
-        const confettiCanvas = document.getElementById('particles-js');
-        confettiCanvas.style.display = 'none';
-        window.pJSDom[0].pJS.fn.vendors.destroypJS();
-        window.pJSDom = [];
-      }
-    }
-    document.querySelector('.button-green').addEventListener('click', () => {
-  launchConfetti();
-});
-
-function launchConfetti() {
-  // Zde můžete přidat počet konfet, které chcete vytvořit
-  const confettiCount = 100;
-
-  // Vyčistit konfety z kontejneru před spuštěním nových
-  const container = document.querySelector('.confetti-container');
-  container.innerHTML = '';
-
-  for (let i = 0; i < confettiCount; i++) {
-    const confetti = document.createElement('div');
-    confetti.className = 'confetti';
-    confetti.style.left = Math.random() * 100 + '%';
-    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
-    container.appendChild(confetti);
-  }
-}
   </script>
 </body>
 </html>
