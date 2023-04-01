@@ -133,6 +133,17 @@
         particlesJS.load('particles-js', {});
       }, 5000);
     }
+    document.getElementById('arduino-yippie').addEventListener('click', () => {
+  particlesJS.load('particles-js', confettiConfig);
+  setTimeout(() => {
+    stopConfetti();
+  }, 5000);
+});
+
+function stopConfetti() {
+  const confettiCanvas = document.getElementById('particles-js');
+  confettiCanvas.style.display = 'none';
+}
   </script>
 
   <div id="particles-js" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;"></div>
