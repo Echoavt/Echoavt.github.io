@@ -36,8 +36,23 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // Render player
-      ctx.fillStyle = 'blue';
-      ctx.fillRect(playerX, playerY, playerWidth, playerHeight);
+const headRadius = playerHeight * 0.25;
+const bodyHeight = playerHeight * 0.5;
+const legHeight = playerHeight * 0.25;
+
+// Head
+ctx.fillStyle = 'blue';
+ctx.beginPath();
+ctx.arc(playerX + playerWidth / 2, playerY + headRadius, headRadius, 0, Math.PI * 2);
+ctx.fill();
+
+// Body
+ctx.fillRect(playerX + playerWidth * 0.25, playerY + headRadius * 2, playerWidth * 0.5, bodyHeight);
+
+// Legs
+ctx.fillRect(playerX + playerWidth * 0.25, playerY + headRadius * 2 + bodyHeight, playerWidth * 0.2, legHeight);
+ctx.fillRect(playerX + playerWidth * 0.55, playerY + headRadius * 2 + bodyHeight, playerWidth * 0.2, legHeight);
+
 
       // Apply gravity
       if (!onGround) {
