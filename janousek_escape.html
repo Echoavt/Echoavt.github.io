@@ -9,6 +9,8 @@
       border: 1px solid black;
     }
   </style>
+  <audio id="popupSound" src="vase_cesta_k_zvukovemu_souboru.mp3" preload="auto"></audio>
+
 </head>
 <body>
   <canvas id="gameCanvas" width="640" height="480"></canvas>
@@ -101,6 +103,8 @@ ctx.fillRect(playerX + playerWidth * 0.55, playerY + headRadius * 2 + bodyHeight
     }
 
     function showTransistorPopup() {
+      const popupSound = document.getElementById('popupSound');
+  popupSound.play();
       popupImage.style.display = 'block';
       setTimeout(() => {
         popupImage.style.display = 'none';
