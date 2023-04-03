@@ -37,7 +37,11 @@
 
     function gameLoop() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-
+      if (playerX > canvas.width / 2) {
+  groundY -= 1;
+} else if (playerX < canvas.width / 2) {
+  groundY += 1;
+}
       // Render player
 const headRadius = playerHeight * 0.25;
 const bodyHeight = playerHeight * 0.5;
@@ -66,16 +70,16 @@ ctx.fillRect(playerX + playerWidth * 0.55, playerY + headRadius * 2 + bodyHeight
       playerY += velocityY;
 
       // Check for ground
-      if (playerY + playerHeight > canvas.height - 50) {
-        playerY = canvas.height - 50 - playerHeight;
-        onGround = true;
-      } else {
-        onGround = false;
-      }
+      if (playerY + playerHeight > groundY) {
+  playerY = groundY - playerHeight;
+  onGround = true;
+} else {
+  onGround = false;
+}
 
       // Render ground
       ctx.fillStyle = 'green';
-      ctx.fillRect(0, canvas.height - 50, canvas.width, 50);
+      ctx.fillRect(0, groundY, canvas.width, 50);
 
       // Render transistor
       ctx.fillStyle = 'red';
