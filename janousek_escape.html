@@ -52,7 +52,11 @@ let timerInterval;
 
 function gameLoop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-
+   playerY += velocityY;
+      if (playerY < 0) {
+        playerY = 0;
+        velocityY = 0;
+      }
   // Change background color
   const bgColor = Math.floor(playerX / canvas.width * 255);
   ctx.fillStyle = `rgb(${bgColor}, ${bgColor}, 255)`;
@@ -123,19 +127,6 @@ function gameLoop() {
   requestAnimationFrame(gameLoop);
 }
 
-function movePlayer(event) {
-  const keyCode = event.keyCode;
-
-  if (keyCode === 65) { // A key
-    playerX -= 10;
-  } else if (keyCode === 68) { // D key
-    playerX += 10;
-  } else if (keyCode === 87 && onGround) { // W key
-    velocityY = -12;
-    onGround = false;
-  }
-}
-
 function checkCollision(obstacle) {
   if (playerX + playerWidth > obstacle.x && playerX < obstacle.x + obstacle.width &&
       playerY + playerHeight > obstacle.y && playerY < obstacle.y + obstacle.height) {
@@ -151,18 +142,6 @@ function checkPowerUp(powerUp) {
   }
 }
 
-function gameOver() {
-  ctx.font = '48px Arial';
-  ctx.fillStyle = 'red';
-  ctx.fillText('Game Over', canvas.width / 2 - 100, canvas.height / 2);
-  cancelAnimationFrame(gameLoop);
-  clearInterval(timerInterval);
-  setTimeout(() => {
-  if (confirm('Chcete hrát znovu?')) {
-  restartGame();
-  }
- }, 1000);
-}
 function showTransistorPopup() {
   const popupSound = document.getElementById('popupSound');
   popupSound.play();
