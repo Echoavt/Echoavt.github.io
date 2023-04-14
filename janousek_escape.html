@@ -171,7 +171,43 @@ function showTransistorPopup() {
     popupImage.style.display = 'none';
   }, 5000); // Změna času zobrazení obrázku na 5 sekund
 }
+    
+function gameOver() {
+      ctx.font = '48px Arial';
+      ctx.fillStyle = 'red';
+      ctx.fillText('Game Over', canvas.width / 2 - 100, canvas.height / 2);
+      cancelAnimationFrame(gameLoop);
+      clearInterval(timerInterval);
+      
+      // Zobrazit obrázek a zvuk
+      showTransistorPopup();
 
+      setTimeout(() => {
+        if (confirm('Chcete hrát znovu?')) {
+          restartGame();
+        }
+      }, 1000);
+    }
+
+function movePlayer(event) {
+      const keyCode = event.keyCode;
+
+      if (keyCode === 65) { // A key
+        playerX -= 10;
+        if (playerX < 0) {
+          playerX = 0;
+        }
+      } else if (keyCode === 68) { // D key
+        playerX += 10;
+        if (playerX + playerWidth > canvas.width) {
+          playerX = canvas.width - playerWidth;
+        }
+      } else if (keyCode === 87 && onGround) { // W key
+        velocityY = -12;
+        onGround = false;
+      }
+    }    
+    
 function restartGame() {
   playerX = 50;
   playerY = 50;
