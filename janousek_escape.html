@@ -57,11 +57,6 @@ function gameLoop() {
   const bgColor = Math.floor(playerX / canvas.width * 255);
   ctx.fillStyle = `rgb(${bgColor}, ${bgColor}, 255)`;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  if (playerX > canvas.width / 2) {
-    groundY -= 1;
-  } else if (playerX < canvas.width / 2) {
-    groundY += 1;
-  }
 
   // Render player
   const headRadius = playerHeight * 0.25;
