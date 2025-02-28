@@ -38,12 +38,16 @@
       text-decoration: none;
       transition: 0.3s;
       box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-      background: linear-gradient(135deg, green, darkgreen);
     }
     .button:hover {
       box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.4);
-      background: linear-gradient(135deg, darkgreen, green);
     }
+    /* Specifické styly tlačítek podle barvy */
+    .button-red { background: linear-gradient(135deg, red, darkred); }
+    .button-blue { background: linear-gradient(135deg, blue, darkblue); }
+    .button-green { background: linear-gradient(135deg, green, darkgreen); }
+    .button-blue:hover { background: linear-gradient(135deg, darkblue, blue); }
+    .button-green:hover { background: linear-gradient(135deg, darkgreen, green); }
     canvas#confettiCanvas {
       position: fixed;
       top: 0;
@@ -57,9 +61,9 @@
 <body>
   <canvas id="confettiCanvas"></canvas>
   <div class="button-container">
-    <a href="http://wiki.sps-pi.cz/index.php/SOC" class="button" style="background: linear-gradient(135deg, red, darkred);">SOČ</a>
-    <a href="janousek_escape.html" class="button" style="background: linear-gradient(135deg, blue, darkblue);">Janoušek Escape</a>
-    <button id="confettiBtn" class="button">Arduino Yippie</button>
+    <a href="http://wiki.sps-pi.cz/index.php/SOC" class="button button-red">SOČ</a>
+    <a href="janousek_escape.html" class="button button-blue">Janoušek Escape</a>
+    <button id="confettiBtn" class="button button-green">Arduino Yippie</button>
   </div>
 
   <script>
@@ -71,6 +75,8 @@
     const confetti = [];
     const colors = ['#ff004d', '#ff7700', '#ffcc00', '#33cc33', '#0099ff', '#9933ff'];
     const shapes = ['rectangle', 'circle'];
+    
+    let animationRunning = false;
 
     // Vytvoří jednu konfetu s pokročilou fyzikou
     function createConfettiPiece() {
@@ -143,7 +149,10 @@
 
     document.getElementById("confettiBtn").addEventListener("click", () => {
       launchConfetti();
-      updateConfetti();
+      if (!animationRunning) {
+        animationRunning = true;
+        updateConfetti();
+      }
     });
 
     window.addEventListener("resize", () => {
