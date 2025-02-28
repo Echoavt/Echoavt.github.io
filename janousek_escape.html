@@ -5,201 +5,323 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Janousek Escape</title>
   <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #000;
+    }
     canvas {
+      display: block;
+      margin: 0 auto;
+      background: #ccc;
       border: 1px solid black;
     }
+    #popupImage {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+    }
   </style>
-  <audio id="popupSound" src="https://github.com/Echoavt/Echoavt.github.io/raw/main/Y2Mate.is%20-%20Low%20quality%20spongebob%20screaming-JOyGvHtoMx8-128k-1654312463837.mp3
-" preload="auto"></audio>
+  <!-- Zachovávám odkaz na zvuk -->
+  <audio id="popupSound" src="https://github.com/Echoavt/Echoavt.github.io/raw/main/Y2Mate.is%20-%20Low%20quality%20spongebob%20screaming-JOyGvHtoMx8-128k-1654312463837.mp3" preload="auto"></audio>
 </head>
 <body>
   <canvas id="gameCanvas" width="640" height="480"></canvas>
-  <img id="popupImage" src="https://github.com/Echoavt/Echoavt.github.io/blob/main/image.png?raw=true" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; z-index:10;">
+  <!-- Zachovávám odkaz na obrázek -->
+  <img id="popupImage" src="https://github.com/Echoavt/Echoavt.github.io/blob/main/image.png?raw=true">
   <script>
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-    const popupImage = document.getElementById('popupImage');
+    // Základní nastavení canvasu a proměnných
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+    const popupImage = document.getElementById("popupImage");
+    const popupSound = document.getElementById("popupSound");
 
-    let playerX = 50;
-    let playerY = 50;
-    const playerWidth = 30;
-    const playerHeight = 30;
-
-    const gravity = 0.5;
-    let velocityY = 0;
-    let onGround = false;
-
-    const groundY = canvas.height - 50;
-
-    const obstacles = [
-      {x: 200, y: groundY - 40, width: 40, height: 40, color: 'orange'},
-      {x: 400, y: groundY - 80, width: 40, height: 80, color: 'orange'}
-    ];
-
-    const powerUps = [
-      {x: 150, y: groundY - 60, width: 20, height: 20, color: 'yellow', collected: false},
-      {x: 350, y: groundY - 100, width: 20, height: 20, color: 'yellow', collected: false}
-    ];
-
+    // Herní stavy: "menu", "playing", "gameover"
+    let gameState = "menu";
     let score = 0;
-    let time = 0;
-    let timerInterval;
+    let gameTime = 0;
+    let lastTime;
+    let animationFrameId;
+    
+    // Fyzikální konstanty (v jednotkách px/s a px/s²)
+    const gravity = 2000; // tíhové zrychlení
+    const groundY = canvas.height - 50; // pozice země
 
-    function gameLoop() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Hráč – počáteční hodnoty a fyzikální parametry
+    const player = {
+      x: 50,
+      y: groundY - 30,
+      width: 30,
+      height: 30,
+      velocityX: 0,
+      velocityY: 0,
+      speed: 300,         // horizontální rychlost (px/s)
+      jumpStrength: -800, // počáteční vertikální rychlost při skoku (px/s)
+      onGround: true
+    };
 
-      // Change background color
-      const bgColor = Math.floor(playerX / canvas.width * 255);
-      ctx.fillStyle = `rgb(${bgColor}, ${bgColor}, 255)`;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Pole překážek a power-upů
+    let obstacles = [];
+    let powerUps = [];
+    
+    // Timery pro spawnování
+    let obstacleSpawnTimer = 0;
+    const obstacleSpawnInterval = 1.5; // každých 1.5 s se objeví překážka
+    let powerUpSpawnTimer = 0;
+    const powerUpSpawnInterval = 5; // každých 5 s se objeví power-up
 
-      // Render player
-      const headRadius = playerHeight * 0.25;
-      const bodyHeight = playerHeight * 0.5;
-      const legHeight = playerHeight * 0.25;
+    // Klávesnice – sledování stisknutých tlačítek
+    const keys = {};
 
-      // Head
-      ctx.fillStyle = 'blue';
-      ctx.beginPath();
-      ctx.arc(playerX + playerWidth / 2, playerY + headRadius, headRadius, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Body
-      ctx.fillRect(playerX + playerWidth * 0.25, playerY + headRadius * 2, playerWidth * 0.5, bodyHeight);
-
-      // Legs
-      ctx.fillRect(playerX + playerWidth * 0.25, playerY + headRadius * 2 + bodyHeight, playerWidth * 0.2, legHeight);
-      ctx.fillRect(playerX + playerWidth * 0.55, playerY + headRadius * 2 + bodyHeight, playerWidth * 0.2, legHeight);
-
-      // Apply gravity
-      if (!onGround) {
-        velocityY += gravity;
+    document.addEventListener("keydown", (e) => {
+      keys[e.code] = true;
+      // Ve stavu menu nebo gameover stisk Enter spustí hru/restart
+      if ((gameState === "menu" || gameState === "gameover") && e.code === "Enter") {
+        startGame();
       }
+    });
 
-      // Update player position
-      playerY += velocityY;
+    document.addEventListener("keyup", (e) => {
+      keys[e.code] = false;
+    });
 
-      // Check for ground
-      if (playerY + playerHeight > groundY) {
-        playerY = groundY - playerHeight;
-        onGround = true;
-      } else {
-        onGround = false;
+    // Funkce pro náhodné vytvoření překážky
+    function spawnObstacle() {
+      const width = 30 + Math.random() * 20;    // šířka mezi 30 a 50
+      const height = 30 + Math.random() * 30;     // výška mezi 30 a 60
+      const speed = 250 + Math.random() * 100;      // rychlost mezi 250 a 350 px/s
+      return {
+        x: canvas.width,
+        y: groundY - height,
+        width: width,
+        height: height,
+        speed: speed
+      };
+    }
+
+    // Funkce pro vytvoření power-upu
+    function spawnPowerUp() {
+      const size = 20;
+      return {
+        x: canvas.width,
+        y: groundY - size - Math.random() * 100,
+        width: size,
+        height: size,
+        speed: 250,
+        collected: false
+      };
+    }
+
+    // Obecná funkce pro detekci kolize mezi dvěma obdélníky
+    function rectIntersect(a, b) {
+      return (
+        a.x < b.x + b.width &&
+        a.x + a.width > b.x &&
+        a.y < b.y + b.height &&
+        a.y + a.height > b.y
+      );
+    }
+
+    // Hlavní herní smyčka – využívá requestAnimationFrame
+    function gameLoop(timestamp) {
+      if (!lastTime) lastTime = timestamp;
+      const dt = (timestamp - lastTime) / 1000; // dt v sekundách
+      lastTime = timestamp;
+      update(dt);
+      render();
+      if (gameState === "playing") {
+        animationFrameId = requestAnimationFrame(gameLoop);
       }
+    }
 
-      // Render ground
-      ctx.fillStyle = 'green';
-      ctx.fillRect(0, groundY, canvas.width, 50);
-
-      // Render obstacles
+    // Update herního stavu (fyzika, pohyb, spawnování, kolize)
+    function update(dt) {
+      // Pohyb hráče pomocí kláves A/D nebo šipek vlevo/vpravo
+      if (keys["KeyA"] || keys["ArrowLeft"]) {
+        player.x -= player.speed * dt;
+      }
+      if (keys["KeyD"] || keys["ArrowRight"]) {
+        player.x += player.speed * dt;
+      }
+      // Omezíme hráče na plochu canvasu
+      if (player.x < 0) player.x = 0;
+      if (player.x + player.width > canvas.width) {
+        player.x = canvas.width - player.width;
+      }
+      
+      // Skok: stisk W nebo šipka nahoru
+      if ((keys["KeyW"] || keys["ArrowUp"]) && player.onGround) {
+        player.velocityY = player.jumpStrength;
+        player.onGround = false;
+      }
+      
+      // Aplikace gravitace
+      player.velocityY += gravity * dt;
+      player.y += player.velocityY * dt;
+      
+      // Kolize se zemí
+      if (player.y + player.height >= groundY) {
+        player.y = groundY - player.height;
+        player.velocityY = 0;
+        player.onGround = true;
+      }
+      
+      // Aktualizace překážek
       obstacles.forEach(obstacle => {
-        ctx.fillStyle = obstacle.color;
-        ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
-        checkCollision(obstacle);
+        obstacle.x -= obstacle.speed * dt;
       });
-
-      // Render power-ups
-      powerUps.forEach(powerUp => {
-        if (!powerUp.collected) {
-          ctx.fillStyle = powerUp.color;
-          ctx.fillRect(powerUp.x, powerUp.y, powerUp.width, powerUp.height);
-          checkPowerUp(powerUp);
+      obstacles = obstacles.filter(obstacle => obstacle.x + obstacle.width > 0);
+      
+      // Aktualizace power-upů
+      powerUps.forEach(pu => {
+        pu.x -= pu.speed * dt;
+      });
+      powerUps = powerUps.filter(pu => pu.x + pu.width > 0 && !pu.collected);
+      
+      // Spawnování překážek
+      obstacleSpawnTimer += dt;
+      if (obstacleSpawnTimer >= obstacleSpawnInterval) {
+        obstacles.push(spawnObstacle());
+        obstacleSpawnTimer = 0;
+      }
+      
+      // Spawnování power-upů
+      powerUpSpawnTimer += dt;
+      if (powerUpSpawnTimer >= powerUpSpawnInterval) {
+        powerUps.push(spawnPowerUp());
+        powerUpSpawnTimer = 0;
+      }
+      
+      // Kontrola kolizí s překážkami – pokud dojde ke kolizi, hra končí
+      obstacles.forEach(obstacle => {
+        if (rectIntersect(player, obstacle)) {
+          gameOver();
         }
       });
-
-      // Render score
-      ctx.font = '16px Arial';
-      ctx.fillStyle = 'black';
-      ctx.fillText(`Score: ${score}`, 10, 20);
-
-      // Render timer
-      ctx.fillText(`Time: ${time}s`, 10, 40);
-
-      requestAnimationFrame(gameLoop);
+      
+      // Kontrola kolizí s power-upy – získání bodů
+      powerUps.forEach(pu => {
+        if (rectIntersect(player, pu)) {
+          pu.collected = true;
+          score += 10;
+        }
+      });
+      
+      // Zvyšování skóre a herního času
+      score += dt * 10;
+      gameTime += dt;
     }
 
-    function checkCollision(obstacle) {
-      if (playerX + playerWidth > obstacle.x && playerX < obstacle.x + obstacle.width &&
-          playerY + playerHeight > obstacle.y && playerY < obstacle.y + obstacle.height) {
-        gameOver();
+    // Vykreslovací funkce – kreslí hráče, překážky, pozadí, skóre, atd.
+    function render() {
+      // Vyčištění canvasu
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Dynamické pozadí – mění se na základě skóre
+      let bgVal = Math.min(255, Math.floor(score) % 256);
+      ctx.fillStyle = `rgb(${bgVal}, ${bgVal}, 255)`;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Zem
+      ctx.fillStyle = "green";
+      ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
+      
+      // Hráč – vykreslen jako hlava (kruh), tělo a nohy
+      const headRadius = player.height * 0.25;
+      const bodyHeight = player.height * 0.5;
+      const legHeight = player.height * 0.25;
+      
+      ctx.fillStyle = "blue";
+      ctx.beginPath();
+      ctx.arc(player.x + player.width / 2, player.y + headRadius, headRadius, 0, Math.PI * 2);
+      ctx.fill();
+      
+      ctx.fillRect(player.x + player.width * 0.25, player.y + headRadius * 2, player.width * 0.5, bodyHeight);
+      ctx.fillRect(player.x + player.width * 0.25, player.y + headRadius * 2 + bodyHeight, player.width * 0.2, legHeight);
+      ctx.fillRect(player.x + player.width * 0.55, player.y + headRadius * 2 + bodyHeight, player.width * 0.2, legHeight);
+      
+      // Překážky
+      obstacles.forEach(obstacle => {
+        ctx.fillStyle = "orange";
+        ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+      });
+      
+      // Power-upy
+      powerUps.forEach(pu => {
+        if (!pu.collected) {
+          ctx.fillStyle = "yellow";
+          ctx.fillRect(pu.x, pu.y, pu.width, pu.height);
+        }
+      });
+      
+      // Zobrazení skóre a času
+      ctx.fillStyle = "black";
+      ctx.font = "16px Arial";
+      ctx.fillText(`Score: ${Math.floor(score)}`, 10, 20);
+      ctx.fillText(`Time: ${Math.floor(gameTime)}s`, 10, 40);
+      
+      // Pokud hra neběží, zobrazíme příslušné menu
+      if (gameState === "menu") {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "white";
+        ctx.font = "24px Arial";
+        ctx.fillText("Janousek Escape", canvas.width / 2 - 80, canvas.height / 2 - 20);
+        ctx.font = "18px Arial";
+        ctx.fillText("Stiskni Enter pro start", canvas.width / 2 - 100, canvas.height / 2 + 20);
+      }
+      
+      if (gameState === "gameover") {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "red";
+        ctx.font = "36px Arial";
+        ctx.fillText("Game Over", canvas.width / 2 - 100, canvas.height / 2 - 20);
+        ctx.font = "18px Arial";
+        ctx.fillStyle = "white";
+        ctx.fillText("Stiskni Enter pro restart", canvas.width / 2 - 110, canvas.height / 2 + 20);
       }
     }
 
-    function checkPowerUp(powerUp) {
-      if (playerX + playerWidth > powerUp.x && playerX < powerUp.x + powerUp.width &&
-          playerY + playerHeight > powerUp.y && playerY < powerUp.y + powerUp.height) {
-        powerUp.collected = true;
-        score += 10;
-      }
-    }
-
+    // Funkce pro zobrazení popupu se zvukem při game over
     function showTransistorPopup() {
-      const popupSound = document.getElementById('popupSound');
       popupSound.play();
-      popupImage.style.display = 'block';
+      popupImage.style.display = "block";
       setTimeout(() => {
-        popupImage.style.display = 'none';
+        popupImage.style.display = "none";
       }, 5000);
     }
 
+    // Konec hry – zastaví herní smyčku, zobrazí game over a popup
     function gameOver() {
-      ctx.font = '48px Arial';
-      ctx.fillStyle = 'red';
-      ctx.fillText('Game Over', canvas.width / 2 - 100, canvas.height / 2);
-      cancelAnimationFrame(gameLoop);
-      clearInterval(timerInterval);
-
+      gameState = "gameover";
+      cancelAnimationFrame(animationFrameId);
       showTransistorPopup();
-
-      setTimeout(() => {
-        if (confirm('Chcete hrát znovu?')) {
-          restartGame();
-        }
-      }, 1000);
     }
 
-    function movePlayer(event) {
-      const keyCode = event.keyCode;
+    // Funkce pro spuštění či restart hry – resetuje všechny proměnné
+    function startGame() {
+      gameState = "playing";
+      score = 0;
+      gameTime = 0;
+      player.x = 50;
+      player.y = groundY - player.height;
+      player.velocityY = 0;
+      player.onGround = true;
+      obstacles = [];
+      powerUps = [];
+      obstacleSpawnTimer = 0;
+      powerUpSpawnTimer = 0;
+      lastTime = null;
+      animationFrameId = requestAnimationFrame(gameLoop);
+    }
 
-      if (keyCode === 65) { // A key
-        playerX -= 10;
-        if (playerX < 0) {
-          playerX = 0;
-        }
-      } else if (keyCode === 68) { // D key
-        playerX += 10;
-        if (playerX + playerWidth > canvas.width) {
-          playerX = canvas.width - playerWidth}
-  } else if (keyCode === 87 && onGround) { // W key
-    velocityY = -12;
-    onGround = false;
-  }
-}
-
-function restartGame() {
-  playerX = 50;
-  playerY = 50;
-  groundY = canvas.height - 50;
-  obstacles.forEach(obstacle => {
-    obstacle.x += 50;
-  });
-  powerUps.forEach(powerUp => {
-    powerUp.collected = false;
-    powerUp.x += 50;
-  });
-  score = 0;
-  time = 0;
-  timerInterval = setInterval(() => {
-    time++;
-  }, 1000);
-  gameLoop();
-}
-
-document.addEventListener('keydown', movePlayer);
-timerInterval = setInterval(() => {
-  time++;
-}, 1000);
-gameLoop();
- </script>
+    // Na začátku zobrazíme menu
+    render();
+  </script>
 </body>
 </html>
