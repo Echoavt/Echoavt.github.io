@@ -3,17 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Janoušek Escape</title>
+  <title>Janoušek Escape - Advanced Confetti</title>
   <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
-
     body {
       height: 100vh;
       display: flex;
@@ -24,13 +21,12 @@
       font-family: 'Roboto', sans-serif;
       overflow: hidden;
     }
-
     .button-container {
       display: flex;
       justify-content: center;
       gap: 20px;
+      z-index: 10;
     }
-
     .button {
       display: inline-flex;
       align-items: center;
@@ -42,32 +38,12 @@
       text-decoration: none;
       transition: 0.3s;
       box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+      background: linear-gradient(135deg, green, darkgreen);
     }
-
     .button:hover {
       box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.4);
+      background: linear-gradient(135deg, darkgreen, green);
     }
-
-    .button-red { background: linear-gradient(135deg, red, darkred); }
-    .button-blue { background: linear-gradient(135deg, blue, darkblue); }
-    .button-green { background: linear-gradient(135deg, green, darkgreen); }
-
-    .button-blue:hover { background: linear-gradient(135deg, darkblue, blue); }
-    .button-green:hover { background: linear-gradient(135deg, darkgreen, green); }
-
-    .header {
-      font-size: 48px;
-      color: white;
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-      margin-bottom: 30px;
-      animation: fadeInDown 1s ease;
-    }
-
-    @keyframes fadeInDown {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
     canvas#confettiCanvas {
       position: fixed;
       top: 0;
@@ -80,11 +56,10 @@
 </head>
 <body>
   <canvas id="confettiCanvas"></canvas>
-
   <div class="button-container">
-    <a href="http://wiki.sps-pi.cz/index.php/SOC" class="button button-red">SOČ</a>
-    <a href="janousek_escape.html" class="button button-blue">Janoušek Escape</a>
-    <button class="button button-green" id="confettiBtn">Arduino Yippie</button>
+    <a href="http://wiki.sps-pi.cz/index.php/SOC" class="button" style="background: linear-gradient(135deg, red, darkred);">SOČ</a>
+    <a href="janousek_escape.html" class="button" style="background: linear-gradient(135deg, blue, darkblue);">Janoušek Escape</a>
+    <button id="confettiBtn" class="button">Arduino Yippie</button>
   </div>
 
   <script>
@@ -94,38 +69,74 @@
     canvas.height = window.innerHeight;
 
     const confetti = [];
-    const confettiColors = ["#ff0000", "#00ff00", "#0000ff", "#ffff00", "#ff00ff", "#00ffff"];
+    const colors = ['#ff004d', '#ff7700', '#ffcc00', '#33cc33', '#0099ff', '#9933ff'];
+    const shapes = ['rectangle', 'circle'];
 
+    // Vytvoří jednu konfetu s pokročilou fyzikou
     function createConfettiPiece() {
       return {
         x: Math.random() * canvas.width,
-        y: -10,
-        size: Math.random() * 10 + 5,
-        color: confettiColors[Math.floor(Math.random() * confettiColors.length)],
-        speed: Math.random() * 3 + 2,
-        rotation: Math.random() * 360,
+        y: -20,
+        size: Math.random() * 8 + 8,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        shape: shapes[Math.floor(Math.random() * shapes.length)],
+        vx: Math.random() * 6 - 3,         // horizontální rychlost (-3 až 3)
+        vy: Math.random() * 2 + 3,         // vertikální rychlost (3 až 5)
+        angle: Math.random() * Math.PI * 2,
+        angularVelocity: Math.random() * 0.1 - 0.05,
+        opacity: 1,
+        lifetime: 0
       };
     }
 
+    // Spustí konfety – vytvoří větší množství částic
     function launchConfetti() {
-      for (let i = 0; i < 100; i++) {
+      for (let i = 0; i < 200; i++) {
         confetti.push(createConfettiPiece());
       }
     }
 
+    // Aktualizace a vykreslení každé konfety
     function updateConfetti() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       for (let i = confetti.length - 1; i >= 0; i--) {
-        let c = confetti[i];
-        c.y += c.speed;
-        c.rotation += c.speed;
-        ctx.fillStyle = c.color;
-        ctx.beginPath();
-        ctx.arc(c.x, c.y, c.size, 0, Math.PI * 2);
-        ctx.fill();
-        if (c.y > canvas.height) {
-          confetti.splice(i, 1);
+        let p = confetti[i];
+        p.lifetime += 0.016;  // přibližný časový krok
+
+        // Aplikace gravitace a větrného efektu
+        p.vy += 0.05;
+        p.vx += Math.sin(p.lifetime * 2) * 0.02;
+
+        p.x += p.vx;
+        p.y += p.vy;
+        p.angle += p.angularVelocity;
+
+        // Postupné zeslabení průhlednosti po určité době
+        if (p.lifetime > 4) {
+          p.opacity -= 0.02;
         }
+
+        // Odstranění, pokud konfeta opustí plátno nebo je zcela průhledná
+        if (p.y > canvas.height || p.opacity <= 0) {
+          confetti.splice(i, 1);
+          continue;
+        }
+
+        ctx.save();
+        ctx.globalAlpha = p.opacity;
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.angle);
+        ctx.fillStyle = p.color;
+
+        // Vykreslení konfety podle tvaru
+        if (p.shape === 'rectangle') {
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+        } else {
+          ctx.beginPath();
+          ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
       }
       requestAnimationFrame(updateConfetti);
     }
@@ -133,6 +144,11 @@
     document.getElementById("confettiBtn").addEventListener("click", () => {
       launchConfetti();
       updateConfetti();
+    });
+
+    window.addEventListener("resize", () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
     });
   </script>
 </body>
