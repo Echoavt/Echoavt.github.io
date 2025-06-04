@@ -23,6 +23,8 @@
   <audio id="titleMusic" src="https://github.com/Echoavt/Echoavt.github.io/raw/main/bad-piggies-low-quality.mp3" preload="auto" loop></audio>
   <!-- Hudba během hry -->
   <audio id="gameMusic" src="bad-piggies-low-quality.mp3" preload="auto" loop></audio>
+  <!-- Hudba při prohře -->
+  <audio id="gameOverMusic" src="bad-piggies-low-quality.mp3" preload="auto"></audio>
 </head>
 <body>
   <canvas id="gameCanvas" width="1280" height="720"></canvas>
@@ -41,6 +43,9 @@
     const popupSound = document.getElementById('popupSound');
     const titleMusic = document.getElementById('titleMusic');
     const gameMusic = document.getElementById('gameMusic');
+
+    const gameOverMusic = document.getElementById('gameOverMusic');
+
     const bgTexture = document.getElementById('bgTexture');
     const playerTexture = document.getElementById('playerTexture');
     const obstacleTexture = document.getElementById('obstacleTexture');
@@ -156,6 +161,10 @@
         titleMusic.pause();
         gameMusic.pause();
         gameMusic.currentTime = 0;
+
+        gameOverMusic.currentTime = 0;
+        gameOverMusic.play();
+
         showPopup();
       }
 
@@ -177,6 +186,9 @@
       powerUps = [];
       lastTimestamp = 0;
         // Vypnout/pustit hudbu podle stavu
+
+        gameOverMusic.pause();
+
         gameMusic.currentTime = 0;
         gameMusic.play();
         titleMusic.pause();
@@ -188,6 +200,9 @@
       if (!lastTimestamp) lastTimestamp = timestamp;
       const dt = (timestamp - lastTimestamp) / 1000;
       lastTimestamp = timestamp;
+      if (gameState === "playing" && gameMusic.paused) {
+        gameMusic.play();
+      }
       update(dt);
       render();
       if (gameState === "playing") {
