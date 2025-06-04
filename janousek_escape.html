@@ -21,8 +21,8 @@
   <audio id="popupSound" src="https://github.com/Echoavt/Echoavt.github.io/raw/main/Y2Mate.is%20-%20Low%20quality%20spongebob%20screaming-JOyGvHtoMx8-128k-1654312463837.mp3" preload="auto"></audio>
   <!-- Titulní hudba (placeholder – nahraďte URL odkazem na vaši hudbu) -->
   <audio id="titleMusic" src="https://github.com/Echoavt/Echoavt.github.io/raw/main/bad-piggies-low-quality.mp3" preload="auto" loop></audio>
-  <!-- Hudba při prohře (placeholder – nahraďte URL odkazem na vaši hudbu) -->
-  <audio id="gameOverMusic" src="YOUR_GAMEOVER_MUSIC_URL" preload="auto" loop></audio>
+  <!-- Hudba při prohře -->
+  <audio id="gameOverMusic" src="bad-piggies-low-quality.mp3" preload="auto" loop></audio>
 </head>
 <body>
   <canvas id="gameCanvas" width="1280" height="720"></canvas>
@@ -59,7 +59,12 @@
       velocityY: 0,
       speed: 400,         // horizontální rychlost (px/s)
       jumpStrength: -900, // počáteční vertikální rychlost při skoku (px/s)
-      onGround: false
+      onGround: false,
+      dashCooldown: 0,
+      dashDuration: 0,
+      dashCooldownTime: 2,
+      dashDurationTime: 0.25,
+      dashSpeedMultiplier: 3
     };
 
     // Herní prostředí
@@ -201,13 +206,24 @@
         difficultyTimer = 0;
       }
 
-      // Pohyb hráče
-      if (keys["ArrowLeft"] || keys["KeyA"]) {
-        player.x -= player.speed * dt;
+      // Aktualizace dash schopnosti
+      if (player.dashCooldown > 0) player.dashCooldown -= dt;
+      if (player.dashDuration > 0) player.dashDuration -= dt;
+
+      const dashActive = player.dashDuration > 0;
+
+      let moveDir = 0;
+      if (keys["ArrowLeft"] || keys["KeyA"]) moveDir -= 1;
+      if (keys["ArrowRight"] || keys["KeyD"]) moveDir += 1;
+
+      if ((keys["ShiftLeft"] || keys["ShiftRight"]) && moveDir !== 0 && player.dashCooldown <= 0) {
+        player.dashDuration = player.dashDurationTime;
+        player.dashCooldown = player.dashCooldownTime;
       }
-      if (keys["ArrowRight"] || keys["KeyD"]) {
-        player.x += player.speed * dt;
-      }
+
+      const speedMultiplier = dashActive ? player.dashSpeedMultiplier : 1;
+      player.x += moveDir * player.speed * speedMultiplier * dt;
+
       if ((keys["ArrowUp"] || keys["KeyW"]) && player.onGround) {
         player.velocityY = player.jumpStrength;
         player.onGround = false;
@@ -316,6 +332,8 @@
         ctx.fillText("Janousek Escape", canvas.width / 2 - 200, canvas.height / 2 - 50);
         ctx.font = "32px Arial";
         ctx.fillText("Stiskni Enter pro start", canvas.width / 2 - 180, canvas.height / 2 + 20);
+        ctx.font = "24px Arial";
+        ctx.fillText("Shift = sprint", canvas.width / 2 - 100, canvas.height / 2 + 60);
         if (titleMusic.paused) {
           gameOverMusic.pause();
           titleMusic.currentTime = 0;
