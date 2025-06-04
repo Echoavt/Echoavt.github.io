@@ -43,7 +43,9 @@
     const popupSound = document.getElementById('popupSound');
     const titleMusic = document.getElementById('titleMusic');
     const gameMusic = document.getElementById('gameMusic');
+
     const gameOverMusic = document.getElementById('gameOverMusic');
+
     const bgTexture = document.getElementById('bgTexture');
     const playerTexture = document.getElementById('playerTexture');
     const obstacleTexture = document.getElementById('obstacleTexture');
@@ -159,8 +161,10 @@
         titleMusic.pause();
         gameMusic.pause();
         gameMusic.currentTime = 0;
+
         gameOverMusic.currentTime = 0;
         gameOverMusic.play();
+
         showPopup();
       }
 
@@ -182,7 +186,9 @@
       powerUps = [];
       lastTimestamp = 0;
         // Vypnout/pustit hudbu podle stavu
+
         gameOverMusic.pause();
+
         gameMusic.currentTime = 0;
         gameMusic.play();
         titleMusic.pause();
