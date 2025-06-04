@@ -3,39 +3,57 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Janousek Escape</title>
+  <title>Janousek Escape - Remaster</title>
   <style>
     body {
       margin: 0;
-      overflow: hidden;
-      background: #000;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(#0c0c0c, #333);
+      color: #fff;
+      text-align: center;
+    }
+    header, footer {
+      padding: 20px;
+    }
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     canvas {
-      display: block;
-      margin: 0 auto;
       background: #111;
       border: 2px solid #fff;
     }
   </style>
-  <!-- Zachovávám původní odkaz na popup zvuk -->
-  <audio id="popupSound" src="https://github.com/Echoavt/Echoavt.github.io/raw/main/Y2Mate.is%20-%20Low%20quality%20spongebob%20screaming-JOyGvHtoMx8-128k-1654312463837.mp3" preload="auto"></audio>
-  <!-- Titulní hudba (placeholder – nahraďte URL odkazem na vaši hudbu) -->
-  <audio id="titleMusic" src="https://github.com/Echoavt/Echoavt.github.io/raw/main/bad-piggies-low-quality.mp3" preload="auto" loop></audio>
-  <!-- Hudba během hry -->
-  <audio id="gameMusic" src="bad-piggies-low-quality.mp3" preload="auto" loop></audio>
-  <!-- Hudba při prohře -->
-  <audio id="gameOverMusic" src="bad-piggies-low-quality.mp3" preload="auto"></audio>
 </head>
 <body>
-  <canvas id="gameCanvas" width="1280" height="720"></canvas>
-  <!-- Zachovávám odkaz na obrázek -->
+  <header>
+    <h1>Janousek Escape - Remaster</h1>
+  </header>
+  <main>
+    <canvas id="gameCanvas" width="1280" height="720"></canvas>
+  </main>
+  <footer>
+    © 2025 Echoavt
+  </footer>
+
+  <!-- Sounds -->
+  <audio id="popupSound" src="https://github.com/Echoavt/Echoavt.github.io/raw/main/Y2Mate.is%20-%20Low%20quality%20spongebob%20screaming-JOyGvHtoMx8-128k-1654312463837.mp3" preload="auto"></audio>
+  <audio id="titleMusic" src="https://github.com/Echoavt/Echoavt.github.io/raw/main/bad-piggies-low-quality.mp3" preload="auto" loop></audio>
+  <audio id="gameMusic" src="bad-piggies-low-quality.mp3" preload="auto" loop></audio>
+  <audio id="gameOverMusic" src="bad-piggies-low-quality.mp3" preload="auto"></audio>
+
+  <!-- Assets -->
   <img id="popupImage" src="https://github.com/Echoavt/Echoavt.github.io/blob/main/image.png?raw=true" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; z-index:10;">
-  <!-- Placeholder textury – nahraďte URL odkazem na vaše textury -->
   <img id="bgTexture" src="YOUR_BACKGROUND_TEXTURE_URL" style="display:none;">
   <img id="playerTexture" src="YOUR_PLAYER_TEXTURE_URL" style="display:none;">
   <img id="obstacleTexture" src="YOUR_OBSTACLE_TEXTURE_URL" style="display:none;">
   <img id="powerUpTexture" src="YOUR_POWERUP_TEXTURE_URL" style="display:none;">
-  
+
   <script>
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
@@ -43,9 +61,7 @@
     const popupSound = document.getElementById('popupSound');
     const titleMusic = document.getElementById('titleMusic');
     const gameMusic = document.getElementById('gameMusic');
-
     const gameOverMusic = document.getElementById('gameOverMusic');
-
     const bgTexture = document.getElementById('bgTexture');
     const playerTexture = document.getElementById('playerTexture');
     const obstacleTexture = document.getElementById('obstacleTexture');
@@ -161,14 +177,8 @@
         titleMusic.pause();
         gameMusic.pause();
         gameMusic.currentTime = 0;
-
         gameOverMusic.currentTime = 0;
         gameOverMusic.play();
-
-
-        gameOverMusic.currentTime = 0;
-        gameOverMusic.play();
-
         showPopup();
       }
 
@@ -191,9 +201,6 @@
       lastTimestamp = 0;
         // Vypnout/pustit hudbu podle stavu
         gameOverMusic.pause();
-
-        gameOverMusic.pause();
-
         gameMusic.currentTime = 0;
         gameMusic.play();
         titleMusic.pause();
