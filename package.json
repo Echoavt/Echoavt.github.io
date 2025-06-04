@@ -1,0 +1,9 @@
+{
+  "name": "echoavt.github.io",
+  "version": "1.0.0",
+  "description": "Static site for janousek escape and related resources",
+  "license": "MIT",
+  "scripts": {
+    "test": "echo \"No tests configured\" && exit 0"
+  }
+}
